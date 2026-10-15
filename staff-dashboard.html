@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartStay System - Staff Dashboard</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --foreground: #0a0a0a;
+      --card: #ffffff;
+      --primary: #030213;
+      --primary-foreground: #ffffff;
+      --muted: #ececf0;
+      --muted-foreground: #717182;
+      --border: rgba(0, 0, 0, 0.1);
+      --radius: 0.625rem;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background-color: #f8fafc;
+      color: var(--foreground);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+    
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .header {
+      background-color: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-logo img {
+      height: 3rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-user-info {
+      text-align: right;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .card-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-description {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+
+    .card-content { padding: 1.5rem; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+
+    .badge-green { background-color: #10b981; color: white; }
+    .badge-blue { background-color: #3b82f6; color: white; }
+    .badge-yellow { background-color: #f59e0b; color: white; }
+    .badge-red { background-color: #ef4444; color: white; }
+
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+
+    @media (min-width: 768px) {
+      .md-grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    .tabs-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      background-color: var(--muted);
+      border-radius: var(--radius);
+      padding: 0.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .tabs-trigger {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      background-color: transparent;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tabs-trigger:hover { background-color: rgba(255, 255, 255, 0.5); }
+    .tabs-trigger.active {
+      background-color: white;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container { overflow-x: auto; }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table thead { border-bottom: 1px solid var(--border); }
+    .table th {
+      padding: 0.75rem;
+      text-align: left;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+
+    .table td {
+      padding: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .table tbody tr:hover { background-color: #f1f5f9; }
+
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-1 { gap: 0.25rem; }
+    .gap-2 { gap: 0.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-lg { font-size: 1.125rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-green-600 { color: #16a34a; }
+    .text-blue-600 { color: #2563eb; }
+    .text-yellow-600 { color: #ca8a04; }
+    .text-slate-600 { color: #475569; }
+    .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+    .icon-sm { width: 1rem; height: 1rem; }
+    .icon-lg { width: 2rem; height: 2rem; }
+    .capitalize { text-transform: capitalize; }
+
+    .stat-card .card-description { margin-bottom: 0.5rem; }
+    .stat-card .card-title {
+      font-size: 1.875rem;
+      margin: 0;
+    }
+        /* Form Styles */
+    .form-group { margin-bottom: 1rem; }
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background-color: #f8fafc;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-input[readonly] {
+      background-color: #e2e8f0;
+      color: #64748b;
+    }
+
+    /* Alert Styles */
+    .alert-success {
+      background-color: #d1fae5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    /* Background colors */
+    .bg-slate-50 {
+      background-color: #f8fafc;
+    }
+
+     /* Footer */
+    .footer {
+      background-color: #0f172a;
+      color: white;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      text-align: center;
+    }
+
+    .footer-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .footer-copyright {
+      color: #94a3b8;
+    }
+
+  </style>
+</head>
+<body>
+  
+  <div class="header">
+    <div class="container header-content">
+      <div class="flex items-center gap-2">
+        <div class="header-logo">
+        <img src="smartstaylogo1.png" alt="SmartStay System">
+          <p class="text-sm text-slate-600">Staff Portal</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-user-info">
+          <p id="staff-name" style="font-size: 0.875rem;">Staff</p>
+          <p id="staff-email" class="text-sm text-slate-600">staff@smartstay.com</p>
+        </div>
+        <button class="btn btn-outline" onclick="logout()">
+          <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <div class="container py-8">
+    <!-- Statistics -->
+    <div class="grid grid-cols-1 md-grid-cols-4 mb-8">
+      <div class="card stat-card">
+        <div class="card-header">
+          <p class="card-description">Total Rooms</p>
+          <h3 class="card-title" id="stat-total-rooms">0</h3>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="card-header">
+          <p class="card-description">Available</p>
+          <h3 class="card-title text-green-600" id="stat-available">0</h3>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="card-header">
+          <p class="card-description">Occupied</p>
+          <h3 class="card-title text-blue-600" id="stat-occupied">0</h3>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="card-header">
+          <p class="card-description">Pending Bookings</p>
+          <h3 class="card-title text-yellow-600" id="stat-pending">0</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Updated Tabs List -->
+    <div class="tabs-list" style="grid-template-columns: repeat(3, 1fr);">
+      <button class="tabs-trigger active" data-tab="rooms">Room Management</button>
+      <button class="tabs-trigger" data-tab="bookings">Booking Management</button>
+      <button class="tabs-trigger" data-tab="profile">My Profile</button>
+    </div>
+
+    <!-- Room Management Tab -->
+    <div data-content="rooms">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Room Status Management</h3>
+          <p class="card-description">Update room availability and status</p>
+        </div>
+        <div class="card-content">
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Room Name</th>
+                  <th>Type</th>
+                  <th>Price/Night</th>
+                  <th>Capacity</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rooms-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Management Tab -->
+    <div data-content="bookings" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">All Bookings</h3>
+          <p class="card-description">View and manage all guest bookings</p>
+        </div>
+        <div class="card-content">
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Guest Name</th>
+                  <th>Room</th>
+                  <th>Check-in</th>
+                  <th>Check-out</th>
+                  <th>Guests</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div data-content="profile" class="hidden">
+      <div class="grid grid-cols-1 lg-grid-cols-2 gap-6">
+        <!-- Profile Information Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Staff Profile</h3>
+            <p class="card-description">Update your personal information</p>
+          </div>
+          <div class="card-content">
+            <form id="profile-form">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="profile-name" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="profile-email" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="profile-phone" class="form-input">
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Update Profile</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Account Settings Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Account Settings</h3>
+            <p class="card-description">Manage your account preferences</p>
+          </div>
+          <div class="card-content">
+            <div class="space-y-4">
+              <!-- Change Password -->
+              <div>
+                <h4 class="text-lg mb-2">Change Password</h4>
+                <form id="password-form">
+                  <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="current-password" class="form-input" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="new-password" class="form-input" required minlength="6">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirm-password" class="form-input" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="width: 100%;">Change Password</button>
+                </form>
+              </div>
+
+              <!-- Staff Statistics -->
+              <div>
+                <h4 class="text-lg mb-2">Staff Statistics</h4>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-center p-3 bg-slate-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600" id="total-bookings-managed">0</div>
+                    <div class="text-sm text-slate-600">Bookings Managed</div>
+                  </div>
+                  <div class="text-center p-3 bg-slate-50 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600" id="rooms-updated">0</div>
+                    <div class="text-sm text-slate-600">Rooms Updated</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-title">Stay Smart with SmartStay</div>
+      <p class="footer-copyright">© 2025 SmartStay. All rights reserved.</p>
+    </div>
+  </footer>
+
+    <script type="module">
+    // Check auth
+    const user = JSON.parse(localStorage.getItem('smartstay_user') || 'null');
+    if (!user || user.role !== 'staff') {
+      window.location.href = 'login.html';
+    }
+
+    // Initialize staff data with default values if not exists
+    if (!user.phone) user.phone = '';
+    if (!user.staffId) user.staffId = 'STF' + Date.now().toString().slice(-6);
+    if (!user.department) user.department = 'Front Desk';
+    if (!user.position) user.position = 'Staff';
+    if (!user.accountCreated) user.accountCreated = new Date().toISOString();
+    if (!user.lastLogin) user.lastLogin = new Date().toISOString();
+    if (!user.stats) {
+      user.stats = {
+        bookingsManaged: 0,
+        roomsUpdated: 0
+      };
+    }
+
+    // Update last login
+    user.lastLogin = new Date().toISOString();
+    localStorage.setItem('smartstay_user', JSON.stringify(user));
+
+    document.getElementById('staff-name').textContent = user.name;
+    document.getElementById('staff-email').textContent = user.email;
+
+    const rooms = [
+      { id: '1', name: 'Deluxe Suite', type: 'Suite', price: 599, capacity: 2, status: 'available' },
+      { id: '2', name: 'Executive Room', type: 'Executive', price: 399, capacity: 2, status: 'available' },
+      { id: '3', name: 'Family Suite', type: 'Family', price: 699, capacity: 4, status: 'available' },
+      { id: '4', name: 'Standard Room', type: 'Standard', price: 299, capacity: 2, status: 'available' },
+      { id: '5', name: 'Presidential Suite', type: 'Presidential', price: 999, capacity: 4, status: 'available' },
+      { id: '6', name: 'Business Room', type: 'Business', price: 449, capacity: 2, status: 'available' }
+    ];
+
+    // Initialize profile form
+    function initializeProfileForm() {
+      document.getElementById('profile-name').value = user.name;
+      document.getElementById('profile-email').value = user.email;
+      document.getElementById('profile-phone').value = user.phone;
+      document.getElementById('profile-staff-id').value = user.staffId;
+      document.getElementById('profile-department').value = user.department;
+      document.getElementById('profile-position').value = user.position;
+      
+      updateStaffStatistics();
+      updateSystemInfo();
+    }
+
+    // Update staff statistics
+    function updateStaffStatistics() {
+      document.getElementById('total-bookings-managed').textContent = user.stats.bookingsManaged;
+      document.getElementById('rooms-updated').textContent = user.stats.roomsUpdated;
+    }
+
+    // Update system information
+    function updateSystemInfo() {
+      document.getElementById('last-login').textContent = new Date(user.lastLogin).toLocaleString();
+      document.getElementById('account-created').textContent = new Date(user.accountCreated).toLocaleDateString();
+    }
+
+    // Profile form submission
+    document.getElementById('profile-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const updatedUser = {
+        ...user,
+        name: document.getElementById('profile-name').value,
+        email: document.getElementById('profile-email').value,
+        phone: document.getElementById('profile-phone').value,
+        department: document.getElementById('profile-department').value,
+        position: document.getElementById('profile-position').value
+      };
+
+      // Update user in localStorage
+      localStorage.setItem('smartstay_user', JSON.stringify(updatedUser));
+      
+      // Update header display
+      document.getElementById('staff-name').textContent = updatedUser.name;
+      document.getElementById('staff-email').textContent = updatedUser.email;
+      
+      showAlert('Profile updated successfully!', 'success');
+    });
+
+    // Password form submission
+    document.getElementById('password-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      // Simple validation - in real app, you'd verify current password with backend
+      if (newPassword !== confirmPassword) {
+        showAlert('New passwords do not match!', 'error');
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        showAlert('Password must be at least 6 characters long!', 'error');
+        return;
+      }
+
+      // Update user password (in real app, this would be hashed and sent to backend)
+      const updatedUser = { ...user, password: newPassword };
+      localStorage.setItem('smartstay_user', JSON.stringify(updatedUser));
+      
+      // Clear form
+      document.getElementById('password-form').reset();
+      
+      showAlert('Password changed successfully!', 'success');
+    });
+
+    // Alert function
+    function showAlert(message, type) {
+      // Remove existing alerts
+      const existingAlert = document.querySelector('.alert-success, .alert-error');
+      if (existingAlert) {
+        existingAlert.remove();
+      }
+
+      const alert = document.createElement('div');
+      alert.className = type === 'success' ? 'alert-success' : 'alert-error';
+      alert.textContent = message;
+      
+      // Insert at the top of the profile content
+      const profileContent = document.querySelector('[data-content="profile"]');
+      profileContent.insertBefore(alert, profileContent.firstChild);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+
+    function renderStats() {
+      const bookings = JSON.parse(localStorage.getItem('smartstay_bookings') || '[]');
+      document.getElementById('stat-total-rooms').textContent = rooms.length;
+      document.getElementById('stat-available').textContent = rooms.filter(r => r.status === 'available').length;
+      document.getElementById('stat-occupied').textContent = rooms.filter(r => r.status === 'occupied').length;
+      document.getElementById('stat-pending').textContent = bookings.filter(b => b.status === 'pending').length;
+    }
+
+    function renderRooms() {
+      const table = document.getElementById('rooms-table');
+      const statusColors = {
+        available: 'green',
+        occupied: 'blue',
+        maintenance: 'red'
+      };
+
+      table.innerHTML = rooms.map(room => `
+        <tr>
+          <td>${room.name}</td>
+          <td>${room.type}</td>
+          <td>RM${room.price}</td>
+          <td>${room.capacity}</td>
+          <td><span class="badge badge-${statusColors[room.status]}" style="text-transform: capitalize;">${room.status}</span></td>
+          <td>
+            <div class="flex gap-1">
+              <button class="btn btn-outline btn-sm" onclick="updateRoomStatus('${room.id}', 'available')">Available</button>
+              <button class="btn btn-outline btn-sm" onclick="updateRoomStatus('${room.id}', 'occupied')">Occupied</button>
+              <button class="btn btn-outline btn-sm" onclick="updateRoomStatus('${room.id}', 'maintenance')">Maintenance</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderBookings() {
+      const bookings = JSON.parse(localStorage.getItem('smartstay_bookings') || '[]');
+      const table = document.getElementById('bookings-table');
+      
+      if (bookings.length === 0) {
+        table.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem;">No bookings yet</td></tr>';
+        return;
+      }
+
+      const statusColors = {
+        pending: 'yellow',
+        confirmed: 'blue',
+        completed: 'green',
+        cancelled: 'red'
+      };
+
+      table.innerHTML = bookings.map(booking => {
+        const room = rooms.find(r => r.id === booking.roomId);
+        return `
+          <tr>
+            <td>#${booking.id.slice(-6)}</td>
+            <td>${booking.guestName}</td>
+            <td>${room?.name || 'Unknown'}</td>
+            <td>${new Date(booking.checkIn).toLocaleDateString()}</td>
+            <td>${new Date(booking.checkOut).toLocaleDateString()}</td>
+            <td>${booking.guests}</td>
+            <td><span class="badge badge-${statusColors[booking.status]}" style="text-transform: capitalize;">${booking.status}</span></td>
+            <td>RM${booking.totalAmount}</td>
+            <td>
+              <div class="flex gap-1">
+                <button class="btn btn-outline btn-sm" onclick="updateBookingStatus('${booking.id}', 'confirmed')">Confirm</button>
+                <button class="btn btn-outline btn-sm" onclick="updateBookingStatus('${booking.id}', 'cancelled')">Cancel</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.updateRoomStatus = function(roomId, newStatus) {
+      const room = rooms.find(r => r.id === roomId);
+      if (room) {
+        room.status = newStatus;
+        
+        // Update staff statistics
+        user.stats.roomsUpdated++;
+        localStorage.setItem('smartstay_user', JSON.stringify(user));
+        
+        renderRooms();
+        renderStats();
+        updateStaffStatistics();
+        alert(`Room status updated to ${newStatus}`);
+      }
+    };
+
+    window.updateBookingStatus = function(bookingId, newStatus) {
+      const bookings = JSON.parse(localStorage.getItem('smartstay_bookings') || '[]');
+      const booking = bookings.find(b => b.id === bookingId);
+      
+      if (booking) {
+        booking.status = newStatus;
+        
+        // Update staff statistics
+        user.stats.bookingsManaged++;
+        localStorage.setItem('smartstay_user', JSON.stringify(user));
+        
+        localStorage.setItem('smartstay_bookings', JSON.stringify(bookings));
+        renderBookings();
+        renderStats();
+        updateStaffStatistics();
+        alert(`Booking ${newStatus}`);
+      }
+    };
+
+    // Tab switching
+    document.querySelectorAll('.tabs-trigger').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-tab');
+        
+        document.querySelectorAll('.tabs-trigger').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        document.querySelectorAll('[data-content]').forEach(c => c.classList.add('hidden'));
+        document.querySelector(`[data-content="${target}"]`).classList.remove('hidden');
+        
+        if (target === 'bookings') {
+          renderBookings();
+        } else if (target === 'profile') {
+          initializeProfileForm();
+        }
+      });
+    });
+
+    window.logout = function() {
+      localStorage.removeItem('smartstay_user');
+      window.location.href = 'guest-home.html';
+    };
+
+    renderStats();
+    renderRooms();
+    initializeProfileForm();
+  </script>
+</body>
+</html>

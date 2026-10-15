@@ -1,0 +1,69 @@
+<style>
+    #smartstay-chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: 'Segoe UI', Arial, sans-serif; }
+    #chat-launcher { 
+        width: 60px; height: 60px; background: #27ae60; border-radius: 50%; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer;
+        display: flex; align-items: center; justify-content: center; color: white; font-size: 30px;
+        transition: transform 0.2s;
+    }
+    #chat-launcher:hover { transform: scale(1.1); }
+    #chat-window { 
+        display: none; width: 320px; height: 450px; background: white; 
+        border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); 
+        flex-direction: column; overflow: hidden; position: absolute; bottom: 80px; right: 0;
+    }
+    #chat-header { background: #2c3e50; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+    #chat-content { flex: 1; padding: 15px; overflow-y: auto; background: #fdfdfd; display: flex; flex-direction: column; gap: 10px; }
+    .msg { padding: 10px; border-radius: 12px; max-width: 85%; font-size: 14px; line-height: 1.4; }
+    .user { background: #3498db; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .ai { background: #eee; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+    #chat-input-area { display: flex; padding: 10px; border-top: 1px solid #eee; }
+    #chat-input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 8px 15px; outline: none; }
+</style>
+
+<div id="smartstay-chat-widget">
+    <div id="chat-window">
+        <div id="chat-header">
+            <strong>SmartStay AI</strong>
+            <span style="cursor:pointer" onclick="toggleChat()">×</span>
+        </div>
+        <div id="chat-content">
+            <div class="msg ai">Hi! I'm your SmartStay concierge. Ask me anything about our rooms!</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type here..." onkeypress="if(event.key === 'Enter') sendToAI()">
+        </div>
+    </div>
+    <div id="chat-launcher" onclick="toggleChat()">💬</div>
+</div>
+
+<script>
+function toggleChat() {
+    const win = document.getElementById('chat-window');
+    win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+}
+
+async function sendToAI() {
+    const input = document.getElementById('chat-input');
+    const content = document.getElementById('chat-content');
+    const msg = input.value.trim();
+    if(!msg) return;
+
+    content.innerHTML += `<div class="msg user">${msg}</div>`;
+    input.value = '';
+    content.scrollTop = content.scrollHeight;
+
+    const fd = new FormData();
+    fd.append('message', msg);
+
+    try {
+        // Change the path below if your handler is in a different folder
+        const resp = await fetch('ai_handler.php', { method: 'POST', body: fd });
+        const text = await resp.text();
+        content.innerHTML += `<div class="msg ai">${text}</div>`;
+    } catch (e) {
+        content.innerHTML += `<div class="msg ai">Service temporarily unavailable.</div>`;
+    }
+    content.scrollTop = content.scrollHeight;
+}
+</script>

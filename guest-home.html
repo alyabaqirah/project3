@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --foreground: #0a0a0a;
+      --card: #ffffff;
+      --card-foreground: #0a0a0a;
+      --primary: #030213;
+      --primary-foreground: #ffffff;
+      --secondary: #f1f1f5;
+      --secondary-foreground: #030213;
+      --muted: #ececf0;
+      --muted-foreground: #717182;
+      --accent: #e9ebef;
+      --accent-foreground: #030213;
+      --destructive: #d4183d;
+      --destructive-foreground: #ffffff;
+      --border: rgba(0, 0, 0, 0.1);
+      --input-background: #f3f3f5;
+      --radius: 0.625rem;
+      --font-size: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: var(--font-size);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Typography */
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Header */
+    .header {
+      background-color: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-logo img {
+      height: 3rem;
+    }
+
+    /* Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e5e5ea;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--accent);
+    }
+
+    .btn-lg {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+    }
+
+    /* Card Styles */
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-description {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    /* Badge Styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+
+    .badge-green {
+      background-color: #10b981;
+      color: white;
+    }
+
+    /* Grid System */
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    @media (min-width: 768px) {
+      .md-grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .lg-grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+/* Hero Section */
+.hero {
+  position: relative;
+  height: 100vh; /* Full viewport height */
+  color: white;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: contain; /* Shows entire image without cropping */
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #000; /* Black background for empty spaces */
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: #e2e8f0;
+  margin-bottom: 2.5rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+    /* Room Image */
+    .room-image-container {
+      aspect-ratio: 4/3;
+      background-color: #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .room-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .room-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+    
+    .btn-book-now {
+  background: #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-book-now:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+    .flex {
+      display: flex;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .justify-center {
+      justify-content: center;
+    }
+
+    .gap-2 {
+      gap: 0.5rem;
+    }
+
+    .gap-4 {
+      gap: 1rem;
+    }
+
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mb-12 { margin-bottom: 3rem; }
+    .mt-8 { margin-top: 2rem; }
+    .pb-12 { padding-bottom: 3rem; }
+    .p-8 { padding: 2rem; }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-4xl {
+      font-size: 2.25rem;
+    }
+
+    .text-lg {
+      font-size: 1.125rem;
+    }
+
+    .text-slate-500 {
+      color: #64748b;
+    }
+
+    .text-slate-600 {
+      color: #475569;
+    }
+
+    .bg-black {
+      background-color: black;
+    }
+
+    .rounded-full {
+      border-radius: 9999px;
+    }
+
+    .footer {
+      background-color: #0f172a;
+      color: white;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      text-align: center;
+    }
+
+    .footer-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .footer-copyright {
+      color: #94a3b8;
+    }
+
+    .guest-view-tabs {
+      background-color: white;
+      padding: 2rem 0;
+    }
+
+    .guest-view-tabs-nav {
+      display: inline-flex;
+      background-color: #f1f5f9;
+      border-radius: 9999px;
+      padding: 0.25rem;
+    }
+
+    .guest-view-tab {
+      padding: 0.5rem 2rem;
+      border-radius: 9999px;
+      border: none;
+      background-color: transparent;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 400;
+    }
+
+    .guest-view-tab:hover {
+      color: #0f172a;
+    }
+
+    .guest-view-tab.active {
+      background-color: white;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      color: inherit;
+    }
+
+    .icon-sm {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .icon-lg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .image-grid-item {
+      aspect-ratio: 4/3;
+      background-color: #e2e8f0;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .image-grid-item img {
+      width: 100%;  
+      height: 100%;
+      object-fit:cover;
+    }
+
+    .max-w-3xl {
+      max-width: 48rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .image-grid {
+        grid-template-columns: repeat(1, 1fr);
+      }
+      
+      .guest-view-tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    .px-6 {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .amenity-icon {
+      padding: 0.75rem;
+      background-color: #f1f5f9;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+    }
+
+    .available-dates-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.dates-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 400px;
+}
+
+.dates-title {
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-shadow: none;
+}
+
+.dates-inputs {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.date-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-input-group label {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-shadow: none;
+}
+
+.date-input {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  background: white;
+  color: #0f172a;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-check-availability {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-check-availability:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.availability-status {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.available-text {
+  color: #059669;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .dates-card {
+    min-width: 300px;
+    padding: 1rem;
+  }
+  
+  .dates-inputs {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .date-input-group {
+    width: 100%;
+  }
+  
+  .btn-check-availability {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <script src="DateConstraint.js"></script> 
+  <header class="header">
+    <div class="container header-content">
+      <div class="header-logo">
+        <img src="smartstaylogo1.png" alt="SmartStay System">
+      </div>
+      <div class="flex gap-2">
+        <a href="login.php" class="btn btn-outline">
+          <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          Log In
+        </a>
+        <a href="register.html" class="btn btn-primary">
+          <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          Register
+        </a>
+      </div>
+    </div>
+  </header>
+
+<section class="hero">
+  <div class="hero-bg">
+    <img src="hotel.jpg" alt="Hotel" class="hero-image">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <h2 class="hero-title">Welcome to SmartStay</h2>
+    <p class="hero-subtitle">Experience luxury and comfort in every stay</p>
+    <div class="flex gap-4 justify-center">
+      <a href="register.html" class="btn btn-secondary btn-lg">Book Your Stay</a>
+    </div>
+    
+    <div class="available-dates-container">
+      <div class="dates-card">
+        <h3 class="dates-title">Check Availability</h3>
+        <div class="dates-inputs">
+          <div class="date-input-group">
+            <label for="check-in">Check In</label>
+            <input type="date" id="check-in" class="date-input">
+          </div>
+          <div class="date-input-group">
+            <label for="check-out">Check Out</label>
+            <input type="date" id="check-out" class="date-input">
+          </div>
+          <button class="btn-check-availability">Check Availability</button>
+        </div>
+        <div class="availability-status">
+          <span class="available-text">Rooms available for selected dates</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <div class="container pb-12">
+
+    <section class="guest-view-tabs">
+      <div class="flex justify-center mb-12">
+        <div class="guest-view-tabs-nav">
+          <button class="guest-view-tab active" data-tab="rooms">Rooms</button>
+          <button class="guest-view-tab" data-tab="amenities">Amenities</button>
+          <button class="guest-view-tab" data-tab="about">About</button>
+        </div>
+      </div>
+
+      <div data-content="rooms">
+      <div class="mb-8">
+        <button class="btn btn-primary rounded-full px-6 bg-black">All Rooms</button>
+      </div>
+      <div class="grid grid-cols-1 md-grid-cols-2 lg-grid-cols-3 gap-4 mt-8" id="rooms-grid"></div>
+    </div>
+
+    <div data-content="amenities" class="hidden">
+      <div class="mb-8">
+        <h2 class="text-4xl mb-2">Hotel Amenities</h2>
+        <p class="text-slate-500 mb-6">Enjoy world-class facilities during your stay</p>
+      </div>
+      <div class="grid grid-cols-1 md-grid-cols-2 lg-grid-cols-3 gap-4" id="amenities-grid"></div>
+      
+      <div class="image-grid">
+        <div class="image-grid-item">
+          <img src="https://images.unsplash.com/photo-1755644046048-989506b73a5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGxvYmJ5JTIwbW9kZXJufGVufDF8fHx8MTc2MjkzMTkxMHww&ixlib=rb-4.1.0&q=80&w=1080" alt="Hotel Lobby">
+        </div>
+        <div class="image-grid-item">
+          <img src="https://images.unsplash.com/photo-1623718649591-311775a30c43?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHBvb2x8ZW58MXx8fHwxNzYzMDI3MjEyfDA&ixlib=rb-4.1.0&q=80&w=1080" alt="Hotel Pool">
+        </div>
+      </div>
+    </div>
+
+    <div data-content="about" class="hidden">
+      <div class="mb-8">
+        <h2 class="text-4xl mb-2">About SmartStay</h2>
+        <p class="text-slate-500 mb-6">Your home away from home</p>
+      </div>
+      <div class="max-w-3xl">
+        <div class="card">
+          <div class="card-content p-8">
+            <p class="text-lg mb-4">
+              Welcome to SmartStay, where luxury meets comfort. We provide premium accommodations designed to make your stay unforgettable.
+            </p>
+            <p class="mb-4">
+              Our hotel features world-class amenities, exceptional service, and beautifully designed rooms that cater to both business and leisure travelers.
+            </p>
+            <p>
+              Whether you're here for a weekend getaway or an extended business trip, SmartStay ensures you have everything you need for a comfortable and memorable experience.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-title">Stay Smart with SmartStay</div>
+      <p class="footer-copyright">© 2025 SmartStay. All rights reserved.</p>
+    </div>
+  </footer>
+
+<script type="module">
+function renderRooms(roomsList) {
+    const grid = document.getElementById('rooms-grid');
+    
+    if (!roomsList || roomsList.length === 0) {
+        grid.innerHTML = `
+            <div class="text-center p-8" style="grid-column: 1/-1;">
+                <p style="color: #ef4444; font-weight: bold; font-size: 1.2rem;">Sold Out!</p>
+                <p style="color: #64748b;">No rooms available for these dates. Try other dates.</p>
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = roomsList.map(room => {
+        const countColor = room.units_left <= 2 ? '#d4183d' : '#10b981';
+        const urgencyText = room.units_left <= 2 ? '🔥 Only ' + room.units_left + ' left!' : room.units_left + ' available';
+
+        return `
+        <div class="card">
+            <div class="room-image-container">
+                <img src="${room.image_url || 'hotel.jpg'}" alt="${room.room_name}" class="room-image">
+                <div class="room-badge">
+                    <span class="badge" style="background: white; color: ${countColor}; font-weight: bold; border: 1px solid ${countColor};">
+                        ${urgencyText}
+                    </span>
+                </div>
+            </div>
+            <div class="card-header">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="card-title">${room.room_name}</h3>
+                    <span class="badge badge-green">${room.room_type}</span>
+                </div>
+                <p class="card-description">Perfect for ${room.max_guests} guests</p>
+                <div class="flex justify-between items-center" style="margin-top: 1.5rem;">
+                    <div>
+                        <span style="font-size: 1.25rem; font-weight: bold; display: block;">RM${room.price_per_night}</span>
+                        <span style="color: #717182; font-size: 0.8rem;">per night</span>
+                    </div>
+                    <a href="register.html" class="btn-book-now">Book Now</a>
+                </div>
+            </div>
+        </div>
+    `}).join('');
+}
+
+function initializeAvailability() {
+    const cinInput = document.getElementById('check-in');
+    const coutInput = document.getElementById('check-out');
+    const checkBtn = document.querySelector('.btn-check-availability');
+
+    const today = new Date().toISOString().split('T')[0];
+    cinInput.min = today;
+    coutInput.min = today;
+
+    checkBtn.addEventListener('click', async () => {
+        const cin = cinInput.value;
+        const cout = coutInput.value;
+
+        if (!cin || !cout) {
+            alert("Please pick your dates first!");
+            return;
+        }
+
+        if (cin == cout) {
+            alert("Please choose different dates!");
+            return;
+        }
+
+        checkBtn.innerText = "Searching...";
+        checkBtn.disabled = true;
+
+        try {
+            const response = await fetch(`check_availability.php?checkin=${cin}&checkout=${cout}`);
+            const data = await response.json();
+
+            if(data.length > 0) {
+                // Success Pop-up
+                alert(`Great news! We found ${data.length} types of rooms available for your stay.`);
+                
+                // Switch to Rooms Tab
+                document.querySelector('[data-tab="rooms"]').click();
+                renderRooms(data);
+                
+                // Scroll to results
+                document.getElementById('rooms-grid').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Sorry, we are fully booked for those dates. Please try another selection.");
+            }
+
+        } catch (error) {
+            console.error("Search Error:", error);
+        } finally {
+            checkBtn.innerText = "Check Availability";
+            checkBtn.disabled = false;
+        }
+    });
+}
+
+function initTabs() {
+    document.querySelectorAll('.guest-view-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
+            document.querySelectorAll('.guest-view-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('[data-content]').forEach(content => content.classList.add('hidden'));
+            document.querySelector(`[data-content="${target}"]`).classList.remove('hidden');
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTabs();
+    initializeAvailability();
+    
+    fetch('check_availability.php?checkin=default&checkout=default')
+        .then(res => res.json())
+        .then(rooms => renderRooms(rooms));
+});
+</script>
+</body>
+</html>

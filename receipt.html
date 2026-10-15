@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartStay System - Payment Receipt</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --foreground: #0a0a0a;
+      --card: #ffffff;
+      --primary: #030213;
+      --primary-foreground: #ffffff;
+      --muted: #ececf0;
+      --muted-foreground: #717182;
+      --border: rgba(0, 0, 0, 0.1);
+      --input-background: #f3f3f5;
+      --radius: 0.625rem;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background-color: #f8fafc;
+      color: var(--foreground);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .header {
+      background-color: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-logo img {
+      height: 3rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-user-info {
+      text-align: right;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .btn-outline:hover { background-color: var(--accent); }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover { opacity: 0.9; }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover { opacity: 0.9; }
+
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .card-content {
+      padding: 2rem;
+    }
+
+    .receipt-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .receipt-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .receipt-subtitle {
+      color: var(--muted-foreground);
+      font-size: 1rem;
+    }
+
+    .receipt-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .receipt-info-group {
+      margin-bottom: 1rem;
+    }
+
+    .receipt-label {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .receipt-value {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .receipt-amount {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .receipt-details {
+      background-color: var(--muted);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .receipt-details-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .receipt-details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .receipt-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius);
+      text-transform: uppercase;
+    }
+
+    .status-paid {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-refunded {
+      background-color: #f3e8ff;
+      color: #6d28d9;
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .footer {
+      background-color: #0f172a;
+      color: white;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      text-align: center;
+    }
+
+    .footer-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .footer-copyright {
+      color: #94a3b8;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-4 {
+      margin-top: 1rem;
+    }
+
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+
+    .mb-6 {
+      margin-bottom: 1.5rem;
+    }
+
+    .py-8 {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .alert-success {
+      background-color: #d1fae5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    .alert-warning {
+      background-color: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  
+  <header class="header">
+    <div class="container header-content">
+      <div class="header-logo">
+        <img src="smartstaylogo1.png" alt="SmartStay System">
+        <span class="portal-text">Payment Receipt</span>
+      </div>
+      <div class="header-actions">
+        <div class="header-user-info">
+          <p class="member-name" id="member-name">John Member</p>
+          <p class="member-email" id="member-email">member@smartstay.com</p>
+        </div>
+        <button class="btn btn-outline" onclick="goBackToDashboard()">
+          ← Back to Dashboard
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container py-8">
+    <div class="card">
+      <div class="card-content">
+        <!-- Receipt Header -->
+        <div class="receipt-header">
+          <div class="receipt-title">PAYMENT RECEIPT</div>
+          <div class="receipt-subtitle">SmartStay Hotels & Resorts</div>
+        </div>
+
+        <!-- Receipt Information -->
+        <div id="receipt-content">
+          <!-- Content will be loaded by JavaScript -->
+          <div class="text-center">
+            <p>Loading receipt information...</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="receipt-actions" id="receipt-actions">
+          <!-- Buttons will be loaded by JavaScript -->
+        </div>
+
+        <!-- Footer Note -->
+        <div class="text-center mt-4">
+          <p style="color: var(--muted-foreground); font-size: 0.875rem;">
+            Thank you for choosing SmartStay!<br>
+            For any inquiries, please contact support@smartstay.com
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refund Modal -->
+  <div id="refund-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="text-xl mb-2">Request Refund</h3>
+      <div class="space-y-4">
+        <div class="alert-warning">
+          <p><strong>Refund Policy:</strong></p>
+          <p>• Refunds are processed within 5-7 business days</p>
+          <p>• Cancellation fees may apply based on check-in date</p>
+          <p>• Refund amount will be credited to your original payment method</p>
+        </div>
+        
+        <div id="refund-details">
+          <!-- Refund details will be populated by JavaScript -->
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason for Refund</label>
+          <select id="refund-reason" class="form-input">
+            <option value="">Select a reason</option>
+            <option value="change_of_plans">Change of Plans</option>
+            <option value="found_better_deal">Found Better Deal</option>
+            <option value="travel_restrictions">Travel Restrictions</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group hidden" id="other-reason-container">
+          <label class="form-label">Please specify</label>
+          <textarea id="other-reason" class="form-input" rows="3" placeholder="Please specify your reason..."></textarea>
+        </div>
+
+        <div class="flex gap-2">
+          <button class="btn btn-danger" onclick="submitRefundRequest()" style="flex: 1;">Submit Refund Request</button>
+          <button class="btn btn-outline" onclick="closeRefundModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-title">Stay Smart with SmartStay</div>
+      <p class="footer-copyright">© 2025 SmartStay. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Check auth
+    const user = JSON.parse(localStorage.getItem('smartstay_user') || 'null');
+    if (!user || user.role !== 'member') {
+      window.location.href = 'login.html';
+    }
+
+    // Get current booking ID from localStorage
+    const bookingId = localStorage.getItem('current_receipt_booking');
+    if (!bookingId) {
+      window.location.href = 'member-dashboard.html';
+    }
+
+    // Initialize user info
+    document.getElementById('member-name').textContent = user.name;
+    document.getElementById('member-email').textContent = user.email;
+
+    // Load receipt data
+    function loadReceiptData() {
+      const bookings = JSON.parse(localStorage.getItem('smartstay_bookings') || '[]');
+      const booking = bookings.find(b => b.id === bookingId);
+      const rooms = JSON.parse(localStorage.getItem('smartstay_rooms') || '[]');
+      const room = rooms.find(r => r.id === booking.roomId) || { name: 'Unknown Room', type: 'Standard' };
+
+      if (!booking) {
+        document.getElementById('receipt-content').innerHTML = `
+          <div class="text-center">
+            <p>Receipt not found. Please go back to your dashboard.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Format dates
+      const paymentDate = booking.paymentDate 
+        ? new Date(booking.paymentDate).toLocaleDateString('en-MY', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : 'Not Available';
+
+      const checkInDate = new Date(booking.checkIn).toLocaleDateString('en-MY');
+      const checkOutDate = new Date(booking.checkOut).toLocaleDateString('en-MY');
+
+      // Determine status badge
+      let statusBadge = '';
+      if (booking.paymentStatus === 'paid') {
+        statusBadge = '<span class="status-badge status-paid">PAID</span>';
+      } else if (booking.paymentStatus === 'refunded') {
+        statusBadge = '<span class="status-badge status-refunded">REFUNDED</span>';
+      } else if (booking.paymentStatus === 'cash_pending') {
+        statusBadge = '<span class="status-badge status-pending">CASH PENDING</span>';
+      }
+
+      // Calculate nights
+      const nights = Math.ceil((new Date(booking.checkOut) - new Date(booking.checkIn)) / (1000 * 60 * 60 * 24));
+
+      // Generate receipt HTML
+      document.getElementById('receipt-content').innerHTML = `
+        <div class="receipt-info">
+          <div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Receipt Number</div>
+              <div class="receipt-value">${booking.transactionId || booking.id}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Booking ID</div>
+              <div class="receipt-value">${booking.id}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Payment Date</div>
+              <div class="receipt-value">${paymentDate}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Payment Method</div>
+              <div class="receipt-value">${booking.paymentMethod || 'Not Specified'}</div>
+            </div>
+          </div>
+          <div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Customer Name</div>
+              <div class="receipt-value">${booking.guestName}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Customer Email</div>
+              <div class="receipt-value">${booking.guestEmail}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Payment Status</div>
+              <div class="receipt-value">${statusBadge}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Total Amount</div>
+              <div class="receipt-value receipt-amount">RM${booking.totalAmount.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="receipt-details">
+          <div class="receipt-details-title">Booking Details</div>
+          <div class="receipt-details-grid">
+            <div class="receipt-info-group">
+              <div class="receipt-label">Room Type</div>
+              <div class="receipt-value">${room.name} (${room.type})</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Check-in Date</div>
+              <div class="receipt-value">${checkInDate}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Check-out Date</div>
+              <div class="receipt-value">${checkOutDate}</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Number of Nights</div>
+              <div class="receipt-value">${nights} nights</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Number of Guests</div>
+              <div class="receipt-value">${booking.guests} guests</div>
+            </div>
+            <div class="receipt-info-group">
+              <div class="receipt-label">Room Rate</div>
+              <div class="receipt-value">RM${(booking.totalAmount / nights).toFixed(2)}/night</div>
+            </div>
+          </div>
+        </div>
+
+        ${booking.refundRequested ? `
+          <div class="alert-warning">
+            <p><strong>Refund Information:</strong></p>
+            <p>Refund requested on: ${new Date(booking.refundRequestDate).toLocaleDateString('en-MY')}</p>
+            <p>Refund Status: ${booking.refundStatus || 'Pending'}</p>
+            ${booking.refundAmount ? `<p>Refund Amount: RM${booking.refundAmount.toFixed(2)}</p>` : ''}
+            <p>Refunds are typically processed within 5-7 business days.</p>
+          </div>
+        ` : ''}
+      `;
+
+      // Set up action buttons
+      let actionButtons = '';
+      if (booking.paymentStatus === 'paid' && !booking.refundRequested && booking.status !== 'cancelled') {
+        actionButtons = `
+          <button class="btn btn-danger" onclick="openRefundModal()">
+            Request Refund
+          </button>
+          <button class="btn btn-outline" onclick="printReceipt()">
+            Print Receipt
+          </button>
+          <button class="btn btn-primary" onclick="goBackToDashboard()">
+            Back to Dashboard
+          </button>
+        `;
+      } else if (booking.refundRequested) {
+        actionButtons = `
+          <button class="btn btn-outline" onclick="printReceipt()">
+            Print Receipt
+          </button>
+          <button class="btn btn-primary" onclick="goBackToDashboard()">
+            Back to Dashboard
+          </button>
+        `;
+      } else {
+        actionButtons = `
+          <button class="btn btn-outline" onclick="printReceipt()">
+            Print Receipt
+          </button>
+          <button class="btn btn-primary" onclick="goBackToDashboard()">
+            Back to Dashboard
+          </button>
+        `;
+      }
+
+      document.getElementById('receipt-actions').innerHTML = actionButtons;
+
+      // Set up refund modal content
+      document.getElementById('refund-details').innerHTML = `
+        <div class="receipt-info-group">
+          <div class="receipt-label">Booking ID</div>
+          <div class="receipt-value">${booking.id}</div>
+        </div>
+        <div class="receipt-info-group">
+          <div class="receipt-label">Amount to be Refunded</div>
+          <div class="receipt-value receipt-amount">RM${booking.totalAmount.toFixed(2)}</div>
+        </div>
+        <div class="receipt-info-group">
+          <div class="receipt-label">Payment Method</div>
+          <div class="receipt-value">${booking.paymentMethod}</div>
+        </div>
+      `;
+    }
+
+    // Open refund modal
+    function openRefundModal() {
+      document.getElementById('refund-modal').classList.remove('hidden');
+    }
+
+    // Close refund modal
+    function closeRefundModal() {
+      document.getElementById('refund-modal').classList.add('hidden');
+      document.getElementById('refund-reason').value = '';
+      document.getElementById('other-reason-container').classList.add('hidden');
+      document.getElementById('other-reason').value = '';
+    }
+
+    // Submit refund request
+    function submitRefundRequest() {
+      const refundReason = document.getElementById('refund-reason').value;
+      const otherReason = document.getElementById('other-reason').value;
+
+      if (!refundReason) {
+        alert('Please select a reason for refund');
+        return;
+      }
+
+      if (refundReason === 'other' && !otherReason.trim()) {
+        alert('Please specify your reason for refund');
+        return;
+      }
+
+      const reasonText = refundReason === 'other' ? otherReason : refundReason;
+
+      // Update booking with refund request
+      const bookings = JSON.parse(localStorage.getItem('smartstay_bookings') || '[]');
+      const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+      
+      if (bookingIndex !== -1) {
+        bookings[bookingIndex] = {
+          ...bookings[bookingIndex],
+          refundRequested: true,
+          refundStatus: 'pending',
+          refundRequestDate: new Date().toISOString(),
+          refundReason: reasonText,
+          status: 'cancelled',
+          paymentStatus: 'refunded'
+        };
+        
+        localStorage.setItem('smartstay_bookings', JSON.stringify(bookings));
+      }
+
+      closeRefundModal();
+      
+      // Show success message
+      alert('Refund request submitted successfully!\n\nYour refund will be processed within 5-7 business days.');
+      
+      // Reload receipt data
+      loadReceiptData();
+    }
+
+    // Print receipt
+    function printReceipt() {
+      window.print();
+    }
+
+    // Go back to dashboard
+    function goBackToDashboard() {
+      localStorage.removeItem('current_receipt_booking');
+      window.location.href = 'member-dashboard.html';
+    }
+
+    // Event listener for refund reason change
+    document.getElementById('refund-reason').addEventListener('change', function() {
+      if (this.value === 'other') {
+        document.getElementById('other-reason-container').classList.remove('hidden');
+      } else {
+        document.getElementById('other-reason-container').classList.add('hidden');
+      }
+    });
+
+    // Initialize modal
+    const modal = document.getElementById('refund-modal');
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeRefundModal();
+      }
+    });
+
+    // Load receipt data on page load
+    document.addEventListener('DOMContentLoaded', loadReceiptData);
+  </script>
+</body>
+</html>
